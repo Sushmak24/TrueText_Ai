@@ -35,10 +35,10 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Large dataset files (exclude from git initially)
-*.csv
-*.pkl
+# Large dataset files (exclude only the large one)
+dataset/WELFake_Dataset.csv
 
-# Add these back later when git push works
-# dataset/
-# models/
+# Include smaller dataset and model files
+!dataset/emails.csv
+!dataset/spam.csv
+!models/*.pkl
