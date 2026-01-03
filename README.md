@@ -14,6 +14,8 @@ AI-powered text classification system for detecting spam, fraud, and fake news u
   - Logistic Regression for news analysis
   - TF-IDF vectorization with optimized parameters
 - **Modern Web Interface**: Clean, responsive UI with real-time analysis
+- **📄 Document Upload**: Support for PDF, DOCX, and TXT file analysis
+- **Dual Input Methods**: Type text directly or upload documents for analysis
 - **RESTful API**: Clean Flask backend with JSON responses
 - **Optimized Performance**: Fast training with data sampling and parallel processing
 - **Risk Assessment**: Provides clear classification results with confidence
@@ -89,11 +91,47 @@ TrueText_Ai/
    ```
 
 3. **Access the application**
-   - Web Interface: http://localhost:5000
-   - API Root: http://localhost:5000
-   - Health Check: http://localhost:5000/health
+   - **🌐 Live Demo**: https://truetext-ai.onrender.com
+   - **Local Web Interface**: http://localhost:5000
+   - **API Root**: http://localhost:5000
+   - **Health Check**: http://localhost:5000/health
 
-## 📖 API Usage
+## � Document Upload Feature
+
+### Supported File Formats
+
+The application supports direct document analysis for the following formats:
+
+- **📄 PDF Files** (.pdf) - Extracts text from all pages
+- **📝 Word Documents** (.docx) - Processes paragraph content  
+- **📃 Text Files** (.txt) - Direct text file reading
+
+### How to Use Document Upload
+
+1. **Navigate to**: https://truetext-ai.onrender.com
+2. **Select Model Type**: Choose SMS, Email, or News detection
+3. **Switch to File Tab**: Click "Upload File" tab
+4. **Upload Document**: Select your PDF, DOCX, or TXT file
+5. **Analyze**: Click "Analyze Content" to process the document
+
+### Technical Implementation
+
+```python
+# Document processing uses:
+- PyPDF2 for PDF text extraction
+- python-docx for Word document processing
+- UTF-8 encoding for text files
+- Automatic text cleaning and preprocessing
+```
+
+### Use Cases
+
+- **Email Analysis**: Upload email files for spam detection
+- **Document Verification**: Analyze news articles or reports
+- **Bulk Processing**: Process multiple documents efficiently
+- **Content Review**: Check documents for suspicious content
+
+## �📖 API Usage
 
 ### Text Classification
 
@@ -105,6 +143,8 @@ Analyze text for spam, fraud, or fake news.
 ```
 type: sms | email | news
 text: "Your text content here"
+# OR upload file
+file: [PDF, DOCX, TXT file]
 ```
 
 **Response:**
@@ -131,12 +171,18 @@ curl -X POST "http://localhost:5000/predict" \
 import requests
 
 # Classify SMS message
-response = requests.post(
-    "http://localhost:5000/predict",
-    files={'type': (None, 'sms'), 'text': (None, 'Free entry win prize')}
-)
+data = {'type': 'sms', 'text': 'Free entry win prize'}
+response = requests.post("http://localhost:5000/predict", data=data)
 result = response.json()
 print(f"Prediction: {result['prediction']}")
+
+# Upload PDF file for analysis
+with open('document.pdf', 'rb') as f:
+    files = {'file': f}
+    data = {'type': 'news'}
+    response = requests.post("http://localhost:5000/predict", files=files, data=data)
+    result = response.json()
+    print(f"Prediction: {result['prediction']}")
 ```
 
 ## 🔧 Model Training
@@ -292,6 +338,15 @@ Typical accuracy rates on test datasets:
 *Note: Performance varies based on dataset quality and training parameters.*
 
 ## 🚀 Deployment
+
+### Render Deployment
+
+**🌐 Live Application**: https://truetext-ai.onrender.com
+
+1. **Install Render CLI**
+2. **Login to Render**: `render login`
+3. **Create app**: `render create`
+4. **Deploy**: `git push render main`
 
 ### Heroku Deployment
 
