@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrueText AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* 1. Global Styles & Gradient Background */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Purple/Blue Gradient */
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 2. The Main Card */
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+        }
+
+        /* 3. Header Section (Robot Icon & Title) */
+        .robot-icon {
+            font-size: 3.5rem;
+            color: #6a11cb; /* Purple Color */
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #111827;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: #6B7280;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            margin-bottom: 30px;
+        }
+
+        /* 4. Form Elements */
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 10px;
+            background-color: #F9FAFB;
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: #1F2937;
+            outline: none;
+            box-sizing: border-box; /* Keeps padding inside */
+            transition: border 0.2s;
+        }
+
+        select:focus, textarea:focus {
+            border-color: #6a11cb; /* Purple focus border */
+            background-color: white;
+        }
+
+        textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        /* 5. The Gradient Button */
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+
+        /* 6. Result Box */
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: none;
+        }
+        .safe { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+        .danger { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <i class="fas fa-robot robot-icon"></i>
+        
+        <h1>TrueText AI</h1>
+        <p class="subtitle">Advanced Spam & Fraud Detection System</p>
+
+        <div class="form-group">
+            <label>Select Detection Type</label>
+            <select id="modelType">
+                <option value="sms">📱 SMS Spam Detector</option>
+                <option value="email">📧 Email Spam Detector</option>
+                <option value="news">📰 Fake News Detector</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Paste Content</label>
+            <textarea id="textInput" placeholder="Enter the text message, email body, or news headline here..."></textarea>
+        </div>
+
+        <button onclick="analyze()">Analyze Content</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function analyze() {
+            const text = document.getElementById('textInput').value;
+            const type = document.getElementById('modelType').value;
+            const resBox = document.getElementById('result');
+            const btn = document.querySelector('button');
+
+            if (!text) {
+                alert("Please enter some text!");
+                return;
+            }
+
+            btn.innerText = "Processing...";
+            resBox.style.display = 'none';
+
+            // Send data to Flask Backend
+            const formData = new FormData();
+            formData.append('type', type);
+            formData.append('text', text);
+
+            try {
+                const response = await fetch('/predict', { method: 'POST', body: formData });
+                const data = await response.json();
+
+                resBox.style.display = 'block';
+                resBox.innerText = data.prediction;
+                
+                // Change Color based on Result
+                if (data.prediction.includes("Spam") || data.prediction.includes("Fake")) {
+                    resBox.className = 'danger';
+                } else {
+                    resBox.className = 'safe';
+                }
+            } catch (e) {
+                alert("Connection Error. Is the server running?");
+            }
+            btn.innerText = "Analyze Content";
+        }
+    </script>
+</body>
+</html>
