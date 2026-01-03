@@ -8,18 +8,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* 1. Global Styles & Gradient Background */
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Purple/Blue Gradient */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100vh;
             margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
-        /* 2. The Main Card */
         .card {
             background: white;
             padding: 40px;
@@ -29,102 +26,44 @@
             max-width: 440px;
             text-align: center;
         }
-
-        /* 3. Header Section (Robot Icon & Title) */
-        .robot-icon {
-            font-size: 3.5rem;
-            color: #6a11cb; /* Purple Color */
-            margin-bottom: 10px;
+        .robot-icon { font-size: 3.5rem; color: #6a11cb; margin-bottom: 10px; }
+        h1 { color: #111827; font-size: 1.8rem; margin: 0; }
+        .subtitle { color: #6B7280; font-size: 0.9rem; margin-top: 5px; margin-bottom: 25px; }
+        
+        /* Form & Tabs */
+        .form-group { text-align: left; margin-bottom: 20px; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 8px; }
+        
+        select, textarea, input[type="file"] {
+            width: 100%; padding: 12px; border: 1px solid #E5E7EB;
+            border-radius: 10px; background-color: #F9FAFB;
+            font-size: 0.95rem; font-family: inherit; box-sizing: border-box;
         }
+        textarea { height: 120px; resize: none; }
 
-        h1 {
-            color: #111827;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin: 0;
-        }
+        /* Tabs Logic */
+        .tabs { display: flex; margin-bottom: 15px; background: #F3F4F6; padding: 4px; border-radius: 10px; }
+        .tab { flex: 1; padding: 8px; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #6B7280; border-radius: 8px; }
+        .tab.active { background: white; color: #6a11cb; shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-        .subtitle {
-            color: #6B7280;
-            font-size: 0.9rem;
-            margin-top: 5px;
-            margin-bottom: 30px;
-        }
-
-        /* 4. Form Elements */
-        .form-group {
-            text-align: left;
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 8px;
-        }
-
-        select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #E5E7EB;
-            border-radius: 10px;
-            background-color: #F9FAFB;
-            font-size: 0.95rem;
-            font-family: inherit;
-            color: #1F2937;
-            outline: none;
-            box-sizing: border-box; /* Keeps padding inside */
-            transition: border 0.2s;
-        }
-
-        select:focus, textarea:focus {
-            border-color: #6a11cb; /* Purple focus border */
-            background-color: white;
-        }
-
-        textarea {
-            height: 120px;
-            resize: none;
-        }
-
-        /* 5. The Gradient Button */
-        button {
-            width: 100%;
-            padding: 14px;
+        /* Button & Result */
+        button.analyze-btn {
+            width: 100%; padding: 14px;
             background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.1s;
+            color: white; border: none; border-radius: 10px;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            margin-top: 10px;
         }
-
-        button:hover {
-            transform: translateY(-2px);
-            opacity: 0.95;
-        }
-
-        /* 6. Result Box */
-        #result {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: 600;
-            display: none;
-        }
+        #result { margin-top: 20px; padding: 15px; border-radius: 10px; font-weight: 600; display: none; }
         .safe { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
         .danger { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
     <div class="card">
         <i class="fas fa-robot robot-icon"></i>
-        
         <h1>TrueText AI</h1>
         <p class="subtitle">Advanced Spam & Fraud Detection System</p>
 
@@ -137,35 +76,63 @@
             </select>
         </div>
 
-        <div class="form-group">
-            <label>Paste Content</label>
-            <textarea id="textInput" placeholder="Enter the text message, email body, or news headline here..."></textarea>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('text')" id="tab-text">Paste Text</button>
+            <button class="tab" onclick="switchTab('file')" id="tab-file">Upload File</button>
         </div>
 
-        <button onclick="analyze()">Analyze Content</button>
+        <div id="input-text-group" class="form-group">
+            <textarea id="textInput" placeholder="Paste your message here..."></textarea>
+        </div>
+
+        <div id="input-file-group" class="form-group hidden">
+            <input type="file" id="fileInput" accept=".txt,.pdf,.docx">
+            <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">Supports: .txt, .pdf, .docx</p>
+        </div>
+
+        <button class="analyze-btn" onclick="analyze()">Analyze Content</button>
 
         <div id="result"></div>
     </div>
 
     <script>
+        let currentMode = 'text';
+
+        function switchTab(mode) {
+            currentMode = mode;
+            // Update UI
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + mode).classList.add('active');
+            
+            if(mode === 'text') {
+                document.getElementById('input-text-group').classList.remove('hidden');
+                document.getElementById('input-file-group').classList.add('hidden');
+            } else {
+                document.getElementById('input-text-group').classList.add('hidden');
+                document.getElementById('input-file-group').classList.remove('hidden');
+            }
+        }
+
         async function analyze() {
-            const text = document.getElementById('textInput').value;
             const type = document.getElementById('modelType').value;
             const resBox = document.getElementById('result');
-            const btn = document.querySelector('button');
+            const btn = document.querySelector('.analyze-btn');
+            
+            const formData = new FormData();
+            formData.append('type', type);
 
-            if (!text) {
-                alert("Please enter some text!");
-                return;
+            if (currentMode === 'text') {
+                const text = document.getElementById('textInput').value;
+                if (!text) { alert("Please enter text!"); return; }
+                formData.append('text', text);
+            } else {
+                const fileBox = document.getElementById('fileInput');
+                if (fileBox.files.length === 0) { alert("Please select a file!"); return; }
+                formData.append('file', fileBox.files[0]);
             }
 
             btn.innerText = "Processing...";
             resBox.style.display = 'none';
-
-            // Send data to Flask Backend
-            const formData = new FormData();
-            formData.append('type', type);
-            formData.append('text', text);
 
             try {
                 const response = await fetch('/predict', { method: 'POST', body: formData });
@@ -174,14 +141,13 @@
                 resBox.style.display = 'block';
                 resBox.innerText = data.prediction;
                 
-                // Change Color based on Result
                 if (data.prediction.includes("Spam") || data.prediction.includes("Fake")) {
                     resBox.className = 'danger';
                 } else {
                     resBox.className = 'safe';
                 }
             } catch (e) {
-                alert("Connection Error. Is the server running?");
+                alert("Connection Error.");
             }
             btn.innerText = "Analyze Content";
         }
